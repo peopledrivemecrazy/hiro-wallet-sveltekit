@@ -33,7 +33,8 @@ function verifyBip322(message: string, address: string, signature: string) {
 }
 
 function taggedHash(prefix: string, data: Buffer) {
-	const prefixHash = bitcoinJsLib.crypto.sha256(prefix);
+	const prefixBuffer = Buffer.from(prefix, 'utf8');
+	const prefixHash = bitcoinJsLib.crypto.sha256(prefixBuffer);
 	return bitcoinJsLib.crypto.sha256(Buffer.concat([prefixHash, prefixHash, data]));
 }
 function createToSpend(messageHash: Buffer, outputScript: Buffer) {
@@ -111,6 +112,6 @@ function validateP2tr(toSign: bitcoinJsLib.Transaction, pubkey: Buffer) {
 	assert(schnorrSig.length === 64);
 
 	const pair = ecpair.fromPublicKey(Buffer.concat([Buffer.from([2]), pubkey]));
-  
+
 	return pair.verifySchnorr(hashForSigning, schnorrSig);
 }
