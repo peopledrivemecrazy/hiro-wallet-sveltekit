@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { base } from '$app/paths';
 	import { AppConfig, showConnect, UserSession, openSignatureRequestPopup } from '@stacks/connect';
 	const appDetails = {
 		name: 'Hiro + SvelteKit',
@@ -32,9 +33,16 @@
 			message,
 			paymentType: 'p2tr' // or 'p2wphk' (default)
 		});
+		const r = await fetch(`${base}/api`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(response)
+		});
 		console.log(response);
 	};
-	$: signedIn = false;
+	$: signedIn = userSession.isUserSignedIn();
 
 	const connect = () => {
 		try {
@@ -61,7 +69,8 @@
 
 {#if signedIn}
 	<button on:click={() => signMessage('hello')} class="btn"> Sign Message </button>
-	<button on:click={() => signBip('hello bip322')} class="btn"> Sign BIP322 Message </button>
+	<button on:click={() => signBip('Hello World')} class="btn"> Sign BIP322 Message </button>
+	<slot />
 {:else}
 	<button on:click={connect} class="btn"> Connect Hiro Wallet </button>
 {/if}
