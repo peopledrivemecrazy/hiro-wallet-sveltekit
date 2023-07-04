@@ -20,14 +20,20 @@ export const POST: RequestHandler = async ({ request }) => {
 
 function verifyBip322(message: string, address: string, signature: string) {
 	const { output, pubkey } = bitcoinJsLib.payments.p2tr({ address });
+
 	if (output === undefined) {
 		throw new Error('Only supports p2tr addresses');
 	}
+
 	const hash = taggedHash('BIP0322-signed-message', Buffer.from(message, 'utf8'));
 	const sigBuff = Buffer.from(signature, 'base64');
 
 	const toSpend = createToSpend(hash, output);
 	const toSign = createToSign(toSpend, sigBuff);
+
+	if (pubkey === undefined) {
+		throw new Error('Public key is undefined');
+	}
 
 	return validateP2tr(toSign, pubkey);
 }
@@ -100,10 +106,16 @@ function createToSign(
 function validateP2tr(toSign: bitcoinJsLib.Transaction, pubkey: Buffer) {
 	// Verify the signatures in toSign transaction
 	const [schnorrSig] = toSign.ins[0].witness;
+
+	// Check if pubkey is defined
+	const prevOP = bitcoinJsLib.payments.p2tr({ pubkey });
 	// p2wpkh uses p2pkh script for creating the sighash for some reason
+	if (prevOP.output === undefined) {
+		throw new Error('Public key is undefined');
+	}
 	const hashForSigning = toSign.hashForWitnessV1(
 		0,
-		[bitcoinJsLib.payments.p2tr({ pubkey }).output],
+		[prevOP.output],
 		[0],
 		bitcoinJsLib.Transaction.SIGHASH_DEFAULT
 	);
