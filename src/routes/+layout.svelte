@@ -27,6 +27,15 @@
 		return { signature: _signature, publicKey: _publicKey };
 	};
 
+	const signBip = async (message: string) => {
+		const response = await window.btc.request('signMessage', {
+			message,
+			paymentType: 'p2tr' // or 'p2wphk' (default)
+		});
+		console.log(response);
+	};
+	$: signedIn = false;
+
 	const connect = () => {
 		try {
 			return showConnect({
@@ -37,6 +46,7 @@
 					const userData = userSession.loadUserData();
 					if (userData) {
 						console.log(userData);
+						if (userData.profile) signedIn = true;
 					}
 				},
 				userSession
@@ -46,11 +56,12 @@
 		}
 	};
 
-	$: console.log(userSession.isUserSignedIn());
+	$: console.log(signedIn);
 </script>
 
-{#if userSession.isUserSignedIn()}
+{#if signedIn}
 	<button on:click={() => signMessage('hello')} class="btn"> Sign Message </button>
+	<button on:click={() => signBip('hello bip322')} class="btn"> Sign BIP322 Message </button>
 {:else}
 	<button on:click={connect} class="btn"> Connect Hiro Wallet </button>
 {/if}
