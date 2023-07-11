@@ -12,6 +12,8 @@
 		"format": "prettier --plugin-search-dir . --write ."
 	},
 	"devDependencies": {
+		"@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+		"@rollup/plugin-inject": "^5.0.3",
 		"@sveltejs/adapter-auto": "^2.0.0",
 		"@sveltejs/adapter-vercel": "1.0.0-next.88",
 		"@sveltejs/kit": "^1.20.4",
@@ -30,6 +32,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@bitcoinerlab/secp256k1": "^1.0.5",
 		"@stacks/connect": "^7.3.1",
 		"assert": "^2.0.0",
 		"bitcoinjs-lib": "^6.1.3",

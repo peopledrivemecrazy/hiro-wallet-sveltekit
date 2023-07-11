@@ -3,10 +3,13 @@ import type { RequestHandler } from './$types';
 
 import * as bitcoinJsLib from 'bitcoinjs-lib';
 import { ECPairFactory } from 'ecpair';
-import * as tinysecp from 'tiny-secp256k1';
 import assert from 'assert';
-bitcoinJsLib.initEccLib(tinysecp);
-const ecpair = ECPairFactory(tinysecp);
+import ecc from '@bitcoinerlab/secp256k1';
+
+
+// import * as tinysecp from 'tiny-secp256k1';
+bitcoinJsLib.initEccLib(ecc);
+const ecpair = ECPairFactory(ecc);
 
 export const POST: RequestHandler = async ({ request }) => {
 	const response = await request.json();
